@@ -1,0 +1,51 @@
+{
+	"geode": "5.11.1",
+	"gd": {
+		"win": "2.2081",
+		"android": "2.2081"
+	},
+	"id": "wayago.usl-integration",
+	"name": "USL Integration",
+	"version": "v1.0.5",
+	"developer": "wayago",
+	"description": "The Ultimate Shitty List in-game: Classic, Challenge and Spam lists, placements, players and changes.",
+	"settings": {
+		"placements-title": {
+			"type": "title",
+			"name": "Placements"
+		},
+		"show-placements": {
+			"type": "bool",
+			"name": "Show USL placements",
+			"default": true,
+			"description": "Shows the list icon and USL placement on level cells and level pages."
+		},
+		"show-points": {
+			"type": "bool",
+			"name": "Show points on level pages",
+			"default": true,
+			"description": "Shows how many USL points a level gives next to its placement."
+		}
+	},
+	"resources": {
+		"sprites": [
+			"resources/*.png"
+		]
+	},
+	"dependencies": {
+		"geode.node-ids": ">=v1.23.3"
+	},
+	"links": {
+		"homepage": "https://ultimateshittylist.fun",
+		"community": "https://discord.gg/cgARJXV3AH"
+	},
+	"tags": [
+		"online",
+		"interface",
+		"enhancement"
+	],
+	"issues": {
+		"info": "Report bugs or wrong placements in the USL Discord server.",
+		"url": "https://discord.gg/cgARJXV3AH"
+	}
+}
