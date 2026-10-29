@@ -1,0 +1,56 @@
+name: Bug report
+description: A crash or something in the mod that does not work
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Wrong placements, missing records and account issues belong in the [USL Discord](https://discord.gg/cgARJXV3AH). This form is for the mod itself.
+  - type: input
+    id: mod-version
+    attributes:
+      label: Mod version
+      placeholder: v1.1.0
+    validations:
+      required: true
+  - type: input
+    id: geode-version
+    attributes:
+      label: Geode version
+      placeholder: 5.11.2
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Windows
+        - Android 64
+        - Android 32
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: What you did
+      description: The screen you opened and the buttons you pressed before the problem appeared.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Geode log
+      description: Paste the lines around the error from `geode/logs/Geode.log`, or attach `geode/crashlogs/` for a crash.
+      render: text
+  - type: input
+    id: screenshot
+    attributes:
+      label: Screenshot
+      description: A link to a screenshot, if the problem is visual.

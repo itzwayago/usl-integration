@@ -1,0 +1,21 @@
+name: Feature request
+description: An idea for the mod
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What should change
+      description: Describe the screen and the behaviour you have in mind.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it helps
+      description: What is awkward or missing today?
+  - type: input
+    id: screenshot
+    attributes:
+      label: Reference
+      description: A screenshot or a link to a similar mod, if you have one.
