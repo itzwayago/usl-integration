@@ -64,12 +64,9 @@ void USLChangesPopup::build() {
             color = up ? ccColor3B { 120, 220, 255 } : ccColor3B { 255, 180, 90 };
         }
 
-        auto badgeBg = usl::ui::panel({ 40.f, 16.f }, color, 255);
-        badgeBg->setPosition({ 26.f, 13.f });
-        row->addChild(badgeBg);
-        auto badgeLbl = usl::ui::label(badge, "bigFont.fnt", 0.3f, { 20, 20, 30 });
-        badgeLbl->setPosition(badgeBg->getPosition());
-        badgeLbl->limitLabelWidth(34.f, 0.3f, 0.15f);
+        auto badgeLbl = usl::ui::label(badge, "bigFont.fnt", 0.35f, color);
+        badgeLbl->setPosition({ 26.f, 13.f });
+        badgeLbl->limitLabelWidth(40.f, 0.35f, 0.15f);
         row->addChild(badgeLbl);
 
         auto name = usl::ui::label(c.name, "bigFont.fnt", 0.4f);

@@ -38,10 +38,10 @@ float USLListPopup::rowWidth() const {
 
 void USLListPopup::selectList(usl::ListType type) {
     m_type = type;
-    if (m_tabs) m_tabs->removeFromParent();
-    m_tabs = usl::ui::listTabs(type, m_size.width - 30.f, [this](usl::ListType next) { selectList(next); });
-    m_tabs->setPosition({ m_size.width / 2.f, m_size.height - 46.f });
-    m_mainLayer->addChild(m_tabs, 5);
+    if (m_switcher) m_switcher->removeFromParent();
+    m_switcher = usl::ui::listSwitcher(type, std::min(260.f, m_size.width - 60.f), [this](usl::ListType next) { selectList(next); });
+    m_switcher->setPosition({ m_size.width / 2.f, m_size.height - 44.f });
+    m_mainLayer->addChild(m_switcher, 5);
 
     clearRows();
     m_status->setVisible(false);
@@ -64,8 +64,8 @@ void USLListPopup::clearRows() {
 CCNode* USLListPopup::rowBase(size_t index, float height) {
     auto row = CCNode::create();
     row->setContentSize({ rowWidth(), height });
-    auto bg = usl::ui::panel({ rowWidth() - 4.f, height }, index % 2 ? ccColor3B { 40, 40, 60 } : ccColor3B { 60, 60, 90 }, 150);
-    bg->setPosition({ rowWidth() / 2.f, height / 2.f });
+    // Alternating browns of the game's own list cells.
+    auto bg = CCLayerColor::create(index % 2 ? ccColor4B { 161, 88, 44, 255 } : ccColor4B { 194, 114, 62, 255 }, rowWidth(), height);
     row->addChild(bg, -1);
     return row;
 }

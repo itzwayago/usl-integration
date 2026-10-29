@@ -39,11 +39,6 @@ namespace {
         }
         return records;
     }
-
-    ccColor3B backgroundTint(usl::ListType type) {
-        auto c = usl::listDarkColor(type);
-        return { static_cast<GLubyte>(std::min(255, c.r + 18)), static_cast<GLubyte>(std::min(255, c.g + 18)), static_cast<GLubyte>(std::min(255, c.b + 18)) };
-    }
 }
 
 USLListLayer* USLListLayer::create(usl::ListType type) {
@@ -68,8 +63,7 @@ bool USLListLayer::init(usl::ListType type) {
     m_type = type;
 
     auto winSize = CCDirector::get()->getWinSize();
-    usl::ui::addBackground(this, backgroundTint(type));
-    m_bg = static_cast<CCSprite*>(getChildByID("background"_spr));
+    usl::ui::addBackground(this, usl::ui::MENU_BLUE);
 
     m_list = GJListLayer::create(nullptr, usl::listName(type), { 191, 114, 62, 255 }, LIST_W, LIST_H, 0);
     m_list->setPosition({ winSize.width / 2.f - LIST_W / 2.f, LIST_Y });
@@ -155,45 +149,22 @@ bool USLListLayer::init(usl::ListType type) {
 
     m_pageInfo = usl::ui::label("", "goldFont.fnt", 0.45f);
     m_pageInfo->setAnchorPoint({ 1.f, 1.f });
-    // Under the tab row, right of the list frame: the five tabs need the whole top edge.
-    m_pageInfo->setPosition({ winSize.width - 7.f, winSize.height - 40.f });
+    m_pageInfo->setPosition({ winSize.width - 7.f, winSize.height - 4.f });
     m_pageInfo->setID("page-info"_spr);
     addChild(m_pageInfo, 5);
 
     setKeypadEnabled(true);
     setKeyboardEnabled(true);
 
-    switchList(type);
+    loadList();
     return true;
 }
 
-void USLListLayer::switchList(usl::ListType type) {
-    m_type = type;
+void USLListLayer::loadList() {
     m_page = 1;
-
-    if (m_tabs) m_tabs->removeFromParent();
-    auto winSize = CCDirector::get()->getWinSize();
-    // Leave the corners to the back button and the page counter.
-    m_tabs = usl::ui::listTabs(type, std::min(440.f, winSize.width - 120.f), [this](usl::ListType next) { switchList(next); });
-    m_tabs->setPosition({ winSize.width / 2.f, winSize.height - 22.f });
-    addChild(m_tabs, 5);
-
-    if (m_bg) m_bg->setColor(backgroundTint(type));
-    if (auto title = typeinfo_cast<CCLabelBMFont*>(m_list->getChildByID("title"))) {
-        title->setString(usl::listName(type));
-    } else {
-        // GJListLayer has no node ID for its title; it is the only bigFont label child.
-        for (auto child : CCArrayExt<CCNode*>(m_list->getChildren())) {
-            if (auto lbl = typeinfo_cast<CCLabelBMFont*>(child); lbl && lbl != m_error) {
-                lbl->setString(usl::listName(type));
-                lbl->limitLabelWidth(260.f, 0.85f, 0.3f);
-                break;
-            }
-        }
-    }
-
     showLoading(true);
     WeakRef<USLListLayer> self = this;
+    auto type = m_type;
     usl::Store::get().loadLevels(type, [self, type](bool ok) {
         auto layer = self.lock();
         if (!layer || layer->m_type != type) return;

@@ -10,6 +10,7 @@ namespace usl::rate {
     /// GD difficulty value of a demon face (6 hard, 7 easy, 8 medium, 9 insane, 10 extreme).
     int demonFace(Difficulty difficulty);
     GJFeatureState featureState(Quality quality);
-    /// Swaps the face and glow of a game difficulty sprite, keeping the short or long name it had.
-    void apply(GJDifficultySprite* sprite, Level const& level);
+    /// Swaps the face and glow of a game difficulty sprite. `name` is the variant the game uses there:
+    /// level pages draw the long one ("Extreme Demon"), level cells the short one ("Demon").
+    void apply(GJDifficultySprite* sprite, Level const& level, GJDifficultyName name);
 }

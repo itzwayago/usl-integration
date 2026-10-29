@@ -5,7 +5,9 @@
 - USL rates: levels on the list show the demon difficulty and the Featured, Epic, Legendary or Mythic glow the USL team gave them. Can be turned off in the settings.
 - Spam is now three lists, SCL, Controlled and Unlimited, each with its own placements, players and changes. Before, only SCL levels were shown.
 - The level card shows the USL rate next to the placement.
-- The hub shows the #1 level of every list and the latest change on the Classic List, and fits narrow screens.
+- Screens redone in the style of the game's own menus: stock buttons and backgrounds, no custom cards. Every screen fits 4:3 and 16:9.
+- Level pages say which demon it is (Easy, Medium, Hard, Insane or Extreme Demon), like rated demons in the game.
+- Players and Changes switch between the five lists with arrows.
 - Every list explains its own rules behind the info button.
 - Icons stay sharp at every size: no more broken outlines on small badges.
 - New USL logo, the same one the website uses.

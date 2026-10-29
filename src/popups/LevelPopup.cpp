@@ -18,13 +18,13 @@ namespace {
         }
     }
 
-    CCNode* chip(CCNode* icon, std::string const& text, ccColor3B textColor, ccColor3B bgColor) {
+    CCNode* chip(CCNode* icon, std::string const& text, ccColor3B textColor = { 255, 255, 255 }) {
         auto node = CCNode::create();
         auto lbl = usl::ui::label(text, "bigFont.fnt", 0.38f, textColor);
         float iconW = icon ? 16.f : 0.f;
         float width = lbl->getScaledContentWidth() + iconW + 14.f;
         node->setContentSize({ width, 20.f });
-        auto bg = usl::ui::panel({ width, 20.f }, bgColor, 210);
+        auto bg = usl::ui::panel({ width, 20.f }, { 0, 0, 0 }, 90);
         bg->setPosition({ width / 2.f, 10.f });
         node->addChild(bg);
         if (icon) {
@@ -66,16 +66,16 @@ bool USLLevelPopup::init(usl::Level const& level) {
     // Chips: placement, category, points, list percent.
     auto chips = CCNode::create();
     chips->setID("chips"_spr);
-    chips->addChild(usl::ui::rankBadge(level.list, level.rank, 20.f, fmt::format("{} Top ", usl::listShortName(level.list))));
+    chips->addChild(usl::ui::rankBadge(level.list, level.rank, 20.f, usl::isSpam(level.list) ? fmt::format("{} ", usl::listAbbr(level.list)) : std::string("Top ")));
     if (auto face = usl::ui::rateFace(level, 15.f)) {
-        chips->addChild(chip(face, usl::difficultyName(level.difficulty), { 255, 255, 255 }, { 30, 30, 45 }));
+        chips->addChild(chip(face, usl::difficultyName(level.difficulty)));
     }
     if (level.quality != usl::Quality::None) {
-        chips->addChild(chip(nullptr, usl::qualityName(level.quality), qualityColor(level.quality), { 30, 30, 45 }));
+        chips->addChild(chip(nullptr, usl::qualityName(level.quality), qualityColor(level.quality)));
     }
-    chips->addChild(chip(nullptr, usl::categoryName(level.category), usl::categoryColor(level.category), { 30, 30, 45 }));
-    chips->addChild(chip(nullptr, fmt::format("{} pts", usl::formatPoints(level.points)), { 120, 255, 140 }, { 30, 30, 45 }));
-    chips->addChild(chip(nullptr, fmt::format("List {}%", level.listPercent), { 140, 210, 255 }, { 30, 30, 45 }));
+    chips->addChild(chip(nullptr, usl::categoryName(level.category)));
+    chips->addChild(chip(nullptr, fmt::format("{} pts", usl::formatPoints(level.points))));
+    chips->addChild(chip(nullptr, fmt::format("List {}%", level.listPercent)));
     chips->setContentSize({ W - 30.f, 20.f });
     chips->setAnchorPoint({ 0.5f, 0.5f });
     chips->setLayout(RowLayout::create()->setGap(6.f)->setAutoScale(true));
@@ -157,8 +157,8 @@ void USLLevelPopup::buildRecords(std::vector<usl::Record> const& records) {
         auto row = CCNode::create();
         row->setContentSize({ w, 22.f });
         bool full = r.progress >= 100;
-        auto bg = usl::ui::panel({ w - 4.f, 22.f }, i % 2 ? ccColor3B { 40, 40, 60 } : ccColor3B { 60, 60, 90 }, 150);
-        bg->setPosition({ w / 2.f, 11.f });
+        // Alternating browns of the game's own list cells.
+        auto bg = CCLayerColor::create(i % 2 ? ccColor4B { 161, 88, 44, 255 } : ccColor4B { 194, 114, 62, 255 }, w, 22.f);
         row->addChild(bg, -1);
 
         auto idx = usl::ui::label(fmt::format("{}.", i + 1), "goldFont.fnt", 0.42f);

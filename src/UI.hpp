@@ -4,6 +4,9 @@
 #include <Geode/ui/NineSlice.hpp>
 
 namespace usl::ui {
+    /// Background tint of the game's own menus.
+    constexpr cocos2d::ccColor3B MENU_BLUE = { 0, 102, 255 };
+
     /// Mod sprite drawn with mipmaps, so a big source stays clean at icon size.
     cocos2d::CCSprite* crispSprite(const char* file);
     cocos2d::CCSprite* iconSprite(const char* file, float size);
@@ -21,8 +24,8 @@ namespace usl::ui {
     void addBackground(cocos2d::CCLayer* layer, cocos2d::ccColor3B color);
     CCMenuItemSpriteExtra* backButton(geode::Function<void(CCMenuItemSpriteExtra*)> callback);
 
-    /// One tab per USL list (Classic, Challenge and the three spam lists), sized to fit `width`.
-    cocos2d::CCMenu* listTabs(ListType selected, float width, std::function<void(ListType)> onSelect);
+    /// Arrow, list name, arrow: steps through all five lists and fits any width.
+    cocos2d::CCNode* listSwitcher(ListType selected, float width, std::function<void(ListType)> onSelect);
 
     void openSite(std::string const& path);
 }

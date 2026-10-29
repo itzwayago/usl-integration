@@ -137,53 +137,41 @@ namespace usl::ui {
         return btn;
     }
 
-    CCMenu* listTabs(ListType selected, float width, std::function<void(ListType)> onSelect) {
-        constexpr float tabW = 96.f;
-        constexpr float tabH = 30.f;
-        constexpr float gap = 5.f;
+    CCNode* listSwitcher(ListType selected, float width, std::function<void(ListType)> onSelect) {
+        constexpr float height = 24.f;
+        // The name sits next to the menu, not in it: a CCMenu treats every child as a menu item.
+        auto node = CCNode::create();
+        node->setID("list-switcher"_spr);
+        node->setAnchorPoint({ 0.5f, 0.5f });
+        node->setContentSize({ width, height });
         auto menu = CCMenu::create();
-        menu->setID("list-tabs"_spr);
-        menu->ignoreAnchorPointForPosition(false);
+        menu->setPosition({ 0.f, 0.f });
+        menu->setContentSize({ width, height });
+        node->addChild(menu);
 
-        // One caption scale for all tabs, sized so the longest name fits next to the icon.
-        constexpr float captionWidth = 62.f;
-        float captionScale = 0.55f;
-        for (auto type : LIST_TYPES) {
-            auto probe = CCLabelBMFont::create(listShortName(type), "bigFont.fnt");
-            captionScale = std::min(captionScale, captionWidth / probe->getContentWidth());
-        }
-
-        float rowWidth = tabW * LIST_COUNT + gap * (LIST_COUNT - 1);
-        float scale = std::min(1.f, width / rowWidth);
-        for (auto type : LIST_TYPES) {
-            bool active = type == selected;
-            auto spr = ButtonSprite::create(
-                listShortName(type), static_cast<int>(tabW), true, "bigFont.fnt",
-                active ? "GJ_button_02.png" : "GJ_button_04.png", tabH, captionScale
-            );
-            // Make room for the list icon on the left of the caption.
-            if (auto lbl = spr->m_label) {
-                lbl->setScale(captionScale);
-                lbl->setPositionX(lbl->getPositionX() + 10.f);
-                // Spam lists share an icon, so their colour tells them apart.
-                if (isSpam(type)) lbl->setColor(active ? ccColor3B { 255, 255, 255 } : listColor(type));
-            }
-            auto icon = listIcon(type, 21.f);
-            icon->setPosition({ 15.f, spr->getContentHeight() / 2.f + 1.f });
-            spr->addChild(icon, 5);
-            spr->setScale(scale);
-
-            auto btn = CCMenuItemExt::createSpriteExtra(spr, [onSelect, type](auto) {
-                if (onSelect) onSelect(type);
-            });
-            btn->setID(fmt::format("tab-{}", listId(type)));
-            btn->setEnabled(!active);
+        auto step = [selected](int delta) {
+            auto count = static_cast<int>(LIST_COUNT);
+            return LIST_TYPES[static_cast<size_t>((static_cast<int>(selected) + delta + count) % count)];
+        };
+        auto arrow = [&](bool next) {
+            auto spr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
+            spr->setScale(0.45f);
+            if (next) spr->setFlipX(true);
+            auto target = step(next ? 1 : -1);
+            auto btn = CCMenuItemExt::createSpriteExtra(spr, [onSelect, target](auto) { if (onSelect) onSelect(target); });
+            btn->setID(next ? "next-list-button" : "prev-list-button");
+            btn->setPosition({ next ? width - 10.f : 10.f, height / 2.f });
             menu->addChild(btn);
-        }
+        };
+        arrow(false);
+        arrow(true);
 
-        menu->setContentSize({ rowWidth * scale, tabH * scale });
-        menu->setLayout(RowLayout::create()->setGap(gap * scale)->setAutoScale(false));
-        return menu;
+        auto name = label(listName(selected), "bigFont.fnt", 0.5f);
+        name->limitLabelWidth(width - 50.f, 0.5f, 0.2f);
+        name->setPosition({ width / 2.f, height / 2.f });
+        name->setID("list-name");
+        node->addChild(name);
+        return node;
     }
 
     void openSite(std::string const& path) {

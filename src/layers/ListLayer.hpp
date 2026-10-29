@@ -4,7 +4,7 @@
 #include <Geode/ui/TextInput.hpp>
 #include <Geode/ui/LoadingSpinner.hpp>
 
-/// One USL list rendered with native GD level cells, 10 levels per page.
+/// One USL list rendered with native GD level cells, 10 levels per page, like the game's level browser.
 class USLListLayer : public cocos2d::CCLayer, public LevelManagerDelegate {
 public:
     static USLListLayer* create(usl::ListType type);
@@ -23,7 +23,7 @@ public:
 
 protected:
     bool init(usl::ListType type);
-    void switchList(usl::ListType type);
+    void loadList();
     void applyFilter();
     void showPage(int page);
     void showLoading(bool loading);
@@ -45,7 +45,6 @@ protected:
     std::string m_pendingKey;
 
     GJListLayer* m_list = nullptr;
-    cocos2d::CCMenu* m_tabs = nullptr;
     geode::TextInput* m_search = nullptr;
     geode::LoadingSpinner* m_spinner = nullptr;
     cocos2d::CCLabelBMFont* m_error = nullptr;
@@ -54,5 +53,4 @@ protected:
     CCMenuItemSpriteExtra* m_next = nullptr;
     CCMenuItemSpriteExtra* m_categoryBtn = nullptr;
     ButtonSprite* m_categorySpr = nullptr;
-    cocos2d::CCSprite* m_bg = nullptr;
 };

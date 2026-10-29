@@ -5,7 +5,7 @@
 #include <Geode/ui/ScrollLayer.hpp>
 #include <Geode/ui/LoadingSpinner.hpp>
 
-/// Base for popups that show one scrolling list per USL list type, with tabs on top.
+/// Base for popups that show one scrolling list per USL list, with a list switcher under the title.
 class USLListPopup : public geode::Popup {
 protected:
     bool initList(usl::ListType type, std::string const& title, cocos2d::CCSize size);
@@ -20,7 +20,7 @@ protected:
     virtual void load(usl::ListType type) = 0;
 
     usl::ListType m_type = usl::ListType::Classic;
-    cocos2d::CCMenu* m_tabs = nullptr;
+    cocos2d::CCNode* m_switcher = nullptr;
     geode::ScrollLayer* m_scroll = nullptr;
     geode::LoadingSpinner* m_spinner = nullptr;
     cocos2d::CCLabelBMFont* m_status = nullptr;

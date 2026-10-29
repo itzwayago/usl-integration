@@ -52,7 +52,7 @@ class $modify(USLLevelInfoLayer, LevelInfoLayer) {
     void applyRate() {
         if (!usl::rate::enabled() || !m_level || !m_difficultySprite) return;
         if (auto entry = usl::Store::get().byGdId(m_level->m_levelID.value())) {
-            usl::rate::apply(m_difficultySprite, *entry);
+            usl::rate::apply(m_difficultySprite, *entry, GJDifficultyName::Long);
         }
     }
 

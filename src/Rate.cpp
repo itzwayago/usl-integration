@@ -3,19 +3,6 @@
 using namespace geode::prelude;
 
 namespace usl::rate {
-    namespace {
-        // Only demon faces (6 to 10) have a long variant with "Extreme Demon" written under them,
-        // and it is a good 15% taller. Keep it only where the game already showed one; any other
-        // face becomes the short "Demon" one, which is about the size of the face it replaces.
-        GJDifficultyName nameOf(GJDifficultySprite* sprite) {
-            for (int difficulty = 6; difficulty <= 10; difficulty++) {
-                std::string longFrame = GJDifficultySprite::getDifficultyFrame(difficulty, GJDifficultyName::Long);
-                if (isSpriteFrameName(sprite, longFrame.c_str())) return GJDifficultyName::Long;
-            }
-            return GJDifficultyName::Short;
-        }
-    }
-
     bool enabled() {
         return Mod::get()->getSettingValue<bool>("fake-rate");
     }
@@ -44,11 +31,11 @@ namespace usl::rate {
         }
     }
 
-    void apply(GJDifficultySprite* sprite, Level const& level) {
+    void apply(GJDifficultySprite* sprite, Level const& level, GJDifficultyName name) {
         if (!sprite || !hasRate(level)) return;
         // A rate without a difficulty keeps the game's face and only changes the glow.
         if (level.difficulty != Difficulty::None) {
-            sprite->updateDifficultyFrame(demonFace(level.difficulty), nameOf(sprite));
+            sprite->updateDifficultyFrame(demonFace(level.difficulty), name);
         }
         sprite->updateFeatureState(featureState(level.quality));
     }
