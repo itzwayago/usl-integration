@@ -1,10 +1,18 @@
-# USL Integration
+<p align="center">
+  <img src="logo.png" width="150" alt="USL Integration logo">
+</p>
 
-[![Geode](https://img.shields.io/badge/Geode-5.11.2-5967c9)](https://geode-sdk.org)
-[![Geometry Dash](https://img.shields.io/badge/GD-2.2081-00aff0)](https://geometrydash.com)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+<h1 align="center">USL Integration</h1>
 
-The [Ultimate Shitty List](https://ultimateshittylist.fun) inside Geometry Dash. The mod brings all five USL rankings, placements, rates, player leaderboards and recent changes into the game, using the same level cells and menus players already know.
+<p align="center">
+  <a href="https://geode-sdk.org"><img src="https://img.shields.io/badge/Geode-5.11.2-5967c9" alt="Geode 5.11.2"></a>
+  <a href="https://geometrydash.com"><img src="https://img.shields.io/badge/GD-2.2081-00aff0" alt="Geometry Dash 2.2081"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT license"></a>
+</p>
+
+<p align="center">The <a href="https://ultimateshittylist.fun">Ultimate Shitty List</a> inside Geometry Dash.</p>
+
+The mod brings all five USL rankings, placements, rates, player leaderboards and recent changes into the game, using the same level cells and menus players already know.
 
 ## Features
 
