@@ -28,7 +28,7 @@ The mod brings all five USL rankings, placements, rates, player leaderboards and
 ## Installation
 
 1. Install [Geode](https://geode-sdk.org) for Geometry Dash 2.2081.
-2. Install the mod from the Geode index, or drop the `.geode` file from [Releases](https://github.com/itzwayago/usl-integration/releases) into your Geode `mods` folder.
+2. Download the `.geode` file from [Releases](https://github.com/itzwayago/usl-integration/releases) and drop it into your Geode `mods` folder.
 
 The mod only reads public list data from `ultimateshittylist.fun`. It does not send your account or level data anywhere.
 
