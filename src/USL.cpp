@@ -96,20 +96,19 @@ namespace usl {
             const char* abbr;
             const char* icon;
             ccColor3B color;
-            ccColor3B dark;
         };
 
         constexpr std::array<ListInfo, LIST_COUNT> LIST_INFO = {{
             { ListType::Classic, "classic", "classic", "Classic List", "Classic", "Classic",
-                "list_classic.png"_spr, { 71, 176, 255 }, { 22, 58, 112 } },
+                "list_classic.png"_spr, { 71, 176, 255 } },
             { ListType::Challenge, "challenge", "challenge", "Challenge List", "Challenge", "Challenge",
-                "list_challenge.png"_spr, { 255, 194, 61 }, { 120, 74, 18 } },
+                "list_challenge.png"_spr, { 255, 194, 61 } },
             { ListType::Scl, "spam", "scl", "SCL Spam List", "SCL", "SCL",
-                "list_spam.png"_spr, { 255, 107, 107 }, { 112, 30, 42 } },
+                "list_spam.png"_spr, { 255, 107, 107 } },
             { ListType::Controlled, "spam", "controlled", "Controlled Spam List", "Controlled", "CTRL",
-                "list_spam.png"_spr, { 255, 150, 80 }, { 112, 52, 22 } },
+                "list_spam.png"_spr, { 255, 150, 80 } },
             { ListType::Unlimited, "spam", "unlimited", "Unlimited Spam List", "Unlimited", "UNL",
-                "list_spam.png"_spr, { 214, 120, 255 }, { 74, 34, 112 } },
+                "list_spam.png"_spr, { 214, 120, 255 } },
         }};
 
         ListInfo const& info(ListType type) {
@@ -129,7 +128,6 @@ namespace usl {
     const char* listAbbr(ListType type) { return info(type).abbr; }
     const char* listIcon(ListType type) { return info(type).icon; }
     ccColor3B listColor(ListType type) { return info(type).color; }
-    ccColor3B listDarkColor(ListType type) { return info(type).dark; }
 
     std::string scopeQuery(ListType type) {
         if (isSpam(type)) return fmt::format("list=spam&spam={}", listId(type));

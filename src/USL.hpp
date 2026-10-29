@@ -32,7 +32,6 @@ namespace usl {
     const char* listAbbr(ListType type);
     const char* listIcon(ListType type);
     cocos2d::ccColor3B listColor(ListType type);
-    cocos2d::ccColor3B listDarkColor(ListType type);
 
     /// Demon difficulty staff set on the site. Only Classic levels carry one for now.
     enum class Difficulty { None, Easy, Medium, Hard, Insane, Extreme };
