@@ -5,6 +5,12 @@
 
 using namespace geode::prelude;
 
+// The loader reads this enum from the game binary. If the bindings used at build time
+// are newer than the loader's, Level shifts onto Achievement and the list crashes while
+// building its cells. Keep the numbers pinned to the loader that mod.json targets.
+static_assert(static_cast<int>(BoomListType::Achievement) == 4, "BoomListType changed: check the bindings commit");
+static_assert(static_cast<int>(BoomListType::Level) == 5, "BoomListType changed: check the bindings commit");
+
 namespace {
     constexpr float LIST_W = 356.f;
     constexpr float LIST_H = 184.f;

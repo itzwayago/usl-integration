@@ -6,7 +6,7 @@
 	},
 	"id": "wayago.usl-integration",
 	"name": "USL Integration",
-	"version": "v1.1.0",
+	"version": "v1.2.0",
 	"developer": "wayago",
 	"description": "The Ultimate Shitty List in game: Classic, Challenge and three Spam lists, placements, USL rates, players and changes.",
 	"settings": {

@@ -42,6 +42,9 @@ jobs:
         with:
           combine: true
           target: ${{ matrix.target }}
+          # Must match the loader's bindings commit (5.11.2 / 3909856).
+          # Without the pin, Level shifts onto Achievement and lists crash.
+          bindings-ref: 1605f500d053f8de122bf5c7dc6d17c24866e02e
 
   package:
     name: Package

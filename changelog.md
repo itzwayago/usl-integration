@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.2.0
+
+- Fixed a crash when opening a list page. The build used a newer bindings snapshot than the loader, which shifted `Level` onto `Achievement`, so the game tried to build achievement cells from level data. Builds now pin the bindings to the loader's commit, and a compile-time check stops this from shipping again.
+
 ## v1.1.0
 
 - USL rates: levels on the list show the demon difficulty and the Featured, Epic, Legendary or Mythic glow the USL team gave them. Can be turned off in the settings.
@@ -11,6 +15,7 @@
 - Every list explains its own rules behind the info button.
 - Icons stay sharp at every size: no more broken outlines on small badges.
 - New USL logo, the same one the website uses.
+- Failed API requests wait 15 seconds before retrying, instead of firing on every level cell.
 - Published by wayago under the id wayago.usl-integration. Settings start fresh.
 
 ## v1.0.4
