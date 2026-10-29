@@ -104,29 +104,36 @@ bool USLHubLayer::init() {
 
 CCMenu* USLHubLayer::listRow(std::initializer_list<usl::ListType> types, float buttonWidth, float buttonHeight, float textScale) {
     constexpr float countHeight = 16.f;
-    constexpr float gap = 12.f;
+    constexpr float gap = 14.f;
     auto row = CCMenu::create();
     row->ignoreAnchorPointForPosition(false);
+    float rowWidth = 0.f;
+    float rowHeight = 0.f;
     for (auto type : types) {
         // A stock green button with the level count under it, both pressed together.
-        auto node = CCNode::create();
-        node->setContentSize({ buttonWidth, buttonHeight + countHeight });
         auto spr = ButtonSprite::create(usl::listShortName(type), static_cast<int>(buttonWidth), true, "bigFont.fnt",
             "GJ_button_01.png", buttonHeight, textScale);
-        spr->setPosition({ buttonWidth / 2.f, countHeight + buttonHeight / 2.f });
+        // Keep the caption clear of the button's rounded ends.
+        if (spr->m_label) spr->m_label->limitLabelWidth(buttonWidth - 18.f, textScale, 0.2f);
+        // The button's frame draws past the requested width, so space by its real size.
+        auto size = spr->getScaledContentSize();
+        auto node = CCNode::create();
+        node->setContentSize({ size.width, size.height + countHeight });
+        spr->setPosition({ size.width / 2.f, countHeight + size.height / 2.f });
         node->addChild(spr);
 
         auto count = usl::ui::label("...", "goldFont.fnt", 0.45f);
-        count->setPosition({ buttonWidth / 2.f, countHeight / 2.f });
+        count->setPosition({ size.width / 2.f, countHeight / 2.f });
         node->addChild(count);
         m_countLabels[static_cast<size_t>(type)] = count;
 
         auto btn = CCMenuItemExt::createSpriteExtra(node, [this, type](auto) { openList(type); });
         btn->setID(fmt::format("{}-list-button", usl::listId(type)));
         row->addChild(btn);
+        rowWidth += size.width + (rowWidth > 0.f ? gap : 0.f);
+        rowHeight = std::max(rowHeight, size.height + countHeight);
     }
-    auto count = static_cast<float>(types.size());
-    row->setContentSize({ buttonWidth * count + gap * (count - 1.f), buttonHeight + countHeight });
+    row->setContentSize({ rowWidth, rowHeight });
     row->setLayout(RowLayout::create()->setGap(gap)->setAutoScale(false));
     return row;
 }
