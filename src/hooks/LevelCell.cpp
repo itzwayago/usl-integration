@@ -17,7 +17,7 @@ class $modify(USLLevelCell, LevelCell) {
             usl::rate::apply(face, *entry, GJDifficultyName::Short);
         }
 
-        if (!Mod::get()->getSettingValue<bool>("show-placements") || m_mainLayer->getChildByID("usl-rank"_spr)) return;
+        if (!usl::settings::placements() || m_mainLayer->getChildByID("usl-rank"_spr)) return;
         if (m_compactView) addStatBadge(*entry);
         else addCornerBadge(*entry);
     }

@@ -46,7 +46,7 @@ class $modify(USLLevelInfoLayer, LevelInfoLayer) {
 
     void applyUSL() {
         applyRate();
-        if (Mod::get()->getSettingValue<bool>("show-placements")) addUSLBadge();
+        if (usl::settings::placements()) addUSLBadge();
     }
 
     void applyRate() {
@@ -95,7 +95,7 @@ class $modify(USLLevelInfoLayer, LevelInfoLayer) {
         badge->addChild(plate);
         float width = plate->getContentWidth();
 
-        if (Mod::get()->getSettingValue<bool>("show-points")) {
+        if (usl::settings::points()) {
             auto pts = usl::ui::label(fmt::format("{} pts", usl::formatPoints(entry->points)), "goldFont.fnt", 0.45f);
             pts->setAnchorPoint({ 0.f, 0.5f });
             pts->setPosition({ width + 5.f, 11.f });

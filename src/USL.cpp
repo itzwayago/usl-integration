@@ -1,5 +1,6 @@
 #include "USL.hpp"
 #include <Geode/utils/web.hpp>
+#include <algorithm>
 #include <chrono>
 
 using namespace geode::prelude;
@@ -8,6 +9,8 @@ namespace usl {
     namespace {
         constexpr int64_t LEVELS_TTL_MS = 30 * 60 * 1000;
         constexpr int64_t SHORT_TTL_MS = 2 * 60 * 1000;
+        // Don't hit the site again on every level cell after a failed load.
+        constexpr int64_t RETRY_COOLDOWN_MS = 15 * 1000;
 
         int64_t nowMs() {
             return std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -82,91 +85,55 @@ namespace usl {
         }
     }
 
+    namespace {
+        // Names, query keys and colours live together here so a new list only touches one row.
+        struct ListInfo {
+            ListType type;
+            const char* key;
+            const char* id;
+            const char* name;
+            const char* shortName;
+            const char* abbr;
+            const char* icon;
+            ccColor3B color;
+            ccColor3B dark;
+        };
+
+        constexpr std::array<ListInfo, LIST_COUNT> LIST_INFO = {{
+            { ListType::Classic, "classic", "classic", "Classic List", "Classic", "Classic",
+                "list_classic.png"_spr, { 71, 176, 255 }, { 22, 58, 112 } },
+            { ListType::Challenge, "challenge", "challenge", "Challenge List", "Challenge", "Challenge",
+                "list_challenge.png"_spr, { 255, 194, 61 }, { 120, 74, 18 } },
+            { ListType::Scl, "spam", "scl", "SCL Spam List", "SCL", "SCL",
+                "list_spam.png"_spr, { 255, 107, 107 }, { 112, 30, 42 } },
+            { ListType::Controlled, "spam", "controlled", "Controlled Spam List", "Controlled", "CTRL",
+                "list_spam.png"_spr, { 255, 150, 80 }, { 112, 52, 22 } },
+            { ListType::Unlimited, "spam", "unlimited", "Unlimited Spam List", "Unlimited", "UNL",
+                "list_spam.png"_spr, { 214, 120, 255 }, { 74, 34, 112 } },
+        }};
+
+        ListInfo const& info(ListType type) {
+            auto it = std::ranges::find(LIST_INFO, type, &ListInfo::type);
+            return it == LIST_INFO.end() ? LIST_INFO.front() : *it;
+        }
+    }
+
     bool isSpam(ListType type) {
-        return type == ListType::Scl || type == ListType::Controlled || type == ListType::Unlimited;
+        return type != ListType::Classic && type != ListType::Challenge;
     }
 
-    const char* listKey(ListType type) {
-        switch (type) {
-            case ListType::Classic: return "classic";
-            case ListType::Challenge: return "challenge";
-            default: return "spam";
-        }
-    }
-
-    const char* listId(ListType type) {
-        switch (type) {
-            case ListType::Challenge: return "challenge";
-            case ListType::Scl: return "scl";
-            case ListType::Controlled: return "controlled";
-            case ListType::Unlimited: return "unlimited";
-            default: return "classic";
-        }
-    }
+    const char* listKey(ListType type) { return info(type).key; }
+    const char* listId(ListType type) { return info(type).id; }
+    const char* listName(ListType type) { return info(type).name; }
+    const char* listShortName(ListType type) { return info(type).shortName; }
+    const char* listAbbr(ListType type) { return info(type).abbr; }
+    const char* listIcon(ListType type) { return info(type).icon; }
+    ccColor3B listColor(ListType type) { return info(type).color; }
+    ccColor3B listDarkColor(ListType type) { return info(type).dark; }
 
     std::string scopeQuery(ListType type) {
-        switch (type) {
-            case ListType::Scl: return "list=spam&spam=scl";
-            case ListType::Controlled: return "list=spam&spam=controlled";
-            case ListType::Unlimited: return "list=spam&spam=unlimited";
-            default: return fmt::format("list={}", listKey(type));
-        }
-    }
-
-    const char* listName(ListType type) {
-        switch (type) {
-            case ListType::Challenge: return "Challenge List";
-            case ListType::Scl: return "SCL Spam List";
-            case ListType::Controlled: return "Controlled Spam List";
-            case ListType::Unlimited: return "Unlimited Spam List";
-            default: return "Classic List";
-        }
-    }
-
-    const char* listShortName(ListType type) {
-        switch (type) {
-            case ListType::Challenge: return "Challenge";
-            case ListType::Scl: return "SCL";
-            case ListType::Controlled: return "Controlled";
-            case ListType::Unlimited: return "Unlimited";
-            default: return "Classic";
-        }
-    }
-
-    const char* listAbbr(ListType type) {
-        switch (type) {
-            case ListType::Controlled: return "CTRL";
-            case ListType::Unlimited: return "UNL";
-            default: return listShortName(type);
-        }
-    }
-
-    const char* listIcon(ListType type) {
-        switch (type) {
-            case ListType::Classic: return "list_classic.png"_spr;
-            case ListType::Challenge: return "list_challenge.png"_spr;
-            default: return "list_spam.png"_spr;
-        }
-    }
-
-    ccColor3B listColor(ListType type) {
-        switch (type) {
-            case ListType::Challenge: return { 255, 194, 61 };
-            case ListType::Scl: return { 255, 107, 107 };
-            case ListType::Controlled: return { 255, 150, 80 };
-            case ListType::Unlimited: return { 214, 120, 255 };
-            default: return { 71, 176, 255 };
-        }
-    }
-
-    ccColor3B listDarkColor(ListType type) {
-        switch (type) {
-            case ListType::Challenge: return { 120, 74, 18 };
-            case ListType::Scl: return { 112, 30, 42 };
-            case ListType::Controlled: return { 112, 52, 22 };
-            case ListType::Unlimited: return { 74, 34, 112 };
-            default: return { 22, 58, 112 };
-        }
+        if (isSpam(type)) return fmt::format("list=spam&spam={}", listId(type));
+        return fmt::format("list={}", listKey(type));
     }
 
     const char* difficultyName(Difficulty difficulty) {
@@ -221,6 +188,11 @@ namespace usl {
         return fmt::format("{}mo ago", diff / (86400 * 30));
     }
 
+    namespace settings {
+        bool placements() { return Mod::get()->getSettingValue<bool>("show-placements"); }
+        bool points() { return Mod::get()->getSettingValue<bool>("show-points"); }
+    }
+
     Store& Store::get() {
         static Store store;
         return store;
@@ -262,6 +234,10 @@ namespace usl {
             if (done) done(true);
             return false;
         }
+        if (!force && slot.failedAt && nowMs() - slot.failedAt < RETRY_COOLDOWN_MS) {
+            if (done) done(false);
+            return false;
+        }
         slot.waiting.push_back(std::move(done));
         if (slot.loading) return false;
         slot.loading = true;
@@ -273,6 +249,9 @@ namespace usl {
         if (ok) {
             slot.loaded = true;
             slot.loadedAt = nowMs();
+            slot.failedAt = 0;
+        } else {
+            slot.failedAt = nowMs();
         }
         auto waiting = std::move(slot.waiting);
         slot.waiting.clear();

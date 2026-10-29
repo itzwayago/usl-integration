@@ -20,9 +20,12 @@ namespace usl::ui {
             // and reapply it after a lost GL context, when the reloaded texture has no mipmaps
             // and would draw black. This way a reload just falls back to plain linear filtering,
             // and the next sprite made from the texture rebuilds the mipmaps.
+            GLint previous = 0;
+            glGetIntegerv(GL_TEXTURE_BINDING_2D, &previous);
             ccGLBindTexture2D(texture->getName());
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            ccGLBindTexture2D(static_cast<GLuint>(previous));
         }
     }
 

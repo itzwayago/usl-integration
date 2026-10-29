@@ -106,6 +106,12 @@ namespace usl {
     std::string formatPoints(double points);
     std::string timeAgo(int64_t millis);
 
+    /// The three switches on the mod's settings page, read where they are used.
+    namespace settings {
+        bool placements();
+        bool points();
+    }
+
     using Done = std::function<void(bool ok)>;
 
     /// Main-thread cache of everything the mod reads from the USL public API.
@@ -136,6 +142,7 @@ namespace usl {
             bool loaded = false;
             bool loading = false;
             int64_t loadedAt = 0;
+            int64_t failedAt = 0;
             std::vector<Done> waiting;
         };
         struct Rate {

@@ -57,11 +57,13 @@ void USLChangesPopup::build() {
             badge = "OUT";
             move = fmt::format("was Top {}", c.fromRank);
             color = { 255, 100, 100 };
-        } else {
+        } else if (c.kind == "moved") {
             bool up = c.toRank < c.fromRank;
             badge = up ? "UP" : "DOWN";
             move = fmt::format("{} to {}", c.fromRank, c.toRank);
             color = up ? ccColor3B { 120, 220, 255 } : ccColor3B { 255, 180, 90 };
+        } else {
+            continue;
         }
 
         auto badgeLbl = usl::ui::label(badge, "bigFont.fnt", 0.35f, color);
