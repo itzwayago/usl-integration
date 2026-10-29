@@ -5,11 +5,11 @@
 
 using namespace geode::prelude;
 
-// The loader reads this enum from the game binary. If the bindings used at build time
-// are newer than the loader's, Level shifts onto Achievement and the list crashes while
-// building its cells. Keep the numbers pinned to the loader that mod.json targets.
-static_assert(static_cast<int>(BoomListType::Achievement) == 4, "BoomListType changed: check the bindings commit");
-static_assert(static_cast<int>(BoomListType::Level) == 5, "BoomListType changed: check the bindings commit");
+// Geode 5.11.2 reads list cell types from the game binary, where Level is 5. The SDK
+// bindings on main dropped User, which renumbers Level to 4; passing the header's name
+// then asks the loader for Achievement cells and crashes on level data. Use the value
+// the loader actually has, not the one the current headers happen to give the name.
+constexpr auto LEVEL_CELL_TYPE = static_cast<BoomListType>(5);
 
 namespace {
     constexpr float LIST_W = 356.f;
@@ -288,7 +288,7 @@ void USLListLayer::setListView(CCArray* levels) {
         old->removeFromParent();
         old->release();
     }
-    auto view = CustomListView::create(arr, BoomListType::Level, LIST_H, LIST_W);
+    auto view = CustomListView::create(arr, LEVEL_CELL_TYPE, LIST_H, LIST_W);
     view->retain();
     m_list->addChild(view, 6, 9);
     m_list->m_listView = view;

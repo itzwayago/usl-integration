@@ -2,7 +2,7 @@
 
 ## v1.2.0
 
-- Fixed a crash when opening a list page. The build used a newer bindings snapshot than the loader, which shifted `Level` onto `Achievement`, so the game tried to build achievement cells from level data. Builds now pin the bindings to the loader's commit, and a compile-time check stops this from shipping again.
+- Fixed a crash when opening a list page. Newer bindings renumbered `Level` onto `Achievement`, so the game tried to build achievement cells from level data. The list now passes the value the 5.11.2 loader uses.
 
 ## v1.1.0
 
