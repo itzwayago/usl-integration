@@ -62,6 +62,8 @@ src/
 resources/            sprites and list icons
 ```
 
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) explains the cache, the screens and the hooks.
+
 ## Data
 
 All data comes from the public USL API:
