@@ -1,5 +1,12 @@
-# CMake build trees (Windows, Android 32/64) and packaged .geode files
+# CMake build trees and packaged mods
 /build*/
 /dist/
-# local verification build logs
-/build-check*.log
+*.geode
+
+# Local build output and IDE files
+cmake-build-*/
+.vs/
+.idea/
+*.user
+*.log
+.DS_Store
