@@ -1,5 +1,6 @@
 #include <Geode/modify/LevelCell.hpp>
 #include "../UI.hpp"
+#include "../Rate.hpp"
 
 using namespace geode::prelude;
 
@@ -7,11 +8,16 @@ class $modify(USLLevelCell, LevelCell) {
     void loadFromLevel(GJGameLevel* level) {
         LevelCell::loadFromLevel(level);
         if (!level || level->m_levelType == GJLevelType::Main || level->m_levelType == GJLevelType::Editor) return;
-        if (!Mod::get()->getSettingValue<bool>("show-placements")) return;
 
         auto entry = usl::Store::get().byGdId(level->m_levelID.value());
-        if (!entry || m_mainLayer->getChildByID("usl-rank"_spr)) return;
+        if (!entry) return;
 
+        if (usl::rate::enabled()) {
+            auto face = typeinfo_cast<GJDifficultySprite*>(m_mainLayer->getChildByIDRecursive("difficulty-sprite"));
+            usl::rate::apply(face, *entry);
+        }
+
+        if (!Mod::get()->getSettingValue<bool>("show-placements") || m_mainLayer->getChildByID("usl-rank"_spr)) return;
         if (m_compactView) addStatBadge(*entry);
         else addCornerBadge(*entry);
     }

@@ -1,12 +1,43 @@
 #include "UI.hpp"
+#include "Rate.hpp"
 #include <Geode/utils/web.hpp>
 
 using namespace geode::prelude;
 
 namespace usl::ui {
-    CCSprite* iconSprite(const char* file, float size) {
+    namespace {
+        // Mod sprites are 256 px (UHD) or smaller and drawn anywhere from 8 to 50 units.
+        // Without mipmaps such a downscale skips texels and the outline breaks up,
+        // so every mod texture gets them once. GLES2 only mipmaps power-of-two sizes.
+        void smooth(CCTexture2D* texture) {
+            if (!texture || texture->hasMipmaps()) return;
+            auto w = texture->getPixelsWide();
+            auto h = texture->getPixelsHigh();
+            auto pot = [](unsigned int v) { return v > 0 && (v & (v - 1)) == 0; };
+            if (!pot(w) || !pot(h)) return;
+            texture->generateMipmap();
+            // Raw GL on purpose: setTexParameters would make Android remember the mipmap filter
+            // and reapply it after a lost GL context, when the reloaded texture has no mipmaps
+            // and would draw black. This way a reload just falls back to plain linear filtering,
+            // and the next sprite made from the texture rebuilds the mipmaps.
+            ccGLBindTexture2D(texture->getName());
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        }
+    }
+
+    CCSprite* crispSprite(const char* file) {
         auto spr = CCSprite::create(file);
-        if (!spr) spr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
+        if (!spr) {
+            log::warn("USL: missing sprite {}", file);
+            return CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
+        }
+        smooth(spr->getTexture());
+        return spr;
+    }
+
+    CCSprite* iconSprite(const char* file, float size) {
+        auto spr = crispSprite(file);
         spr->setScale(size / std::max(spr->getContentWidth(), spr->getContentHeight()));
         return spr;
     }
@@ -58,6 +89,21 @@ namespace usl::ui {
         return node;
     }
 
+    CCNode* rateFace(Level const& level, float height) {
+        if (level.difficulty == Difficulty::None) return nullptr;
+        auto face = GJDifficultySprite::create(rate::demonFace(level.difficulty), GJDifficultyName::Short);
+        if (!face) return nullptr;
+        face->updateFeatureState(rate::featureState(level.quality));
+        // The glow is a child drawn bigger than the face; wrap it so layouts see one square node.
+        auto holder = CCNode::create();
+        holder->setContentSize({ height, height });
+        holder->setAnchorPoint({ 0.5f, 0.5f });
+        face->setScale(height / face->getContentHeight());
+        face->setPosition({ height / 2.f, height / 2.f });
+        holder->addChild(face);
+        return holder;
+    }
+
     void addBackground(CCLayer* layer, ccColor3B color) {
         auto winSize = CCDirector::get()->getWinSize();
         auto bg = CCSprite::create("GJ_gradientBG.png");
@@ -91,10 +137,12 @@ namespace usl::ui {
         return btn;
     }
 
-    CCMenu* listTabs(ListType selected, float scale, std::function<void(ListType)> onSelect) {
+    CCMenu* listTabs(ListType selected, float width, std::function<void(ListType)> onSelect) {
+        constexpr float tabW = 96.f;
+        constexpr float tabH = 30.f;
+        constexpr float gap = 5.f;
         auto menu = CCMenu::create();
         menu->setID("list-tabs"_spr);
-        menu->setContentSize({ 350.f * scale, 30.f * scale });
         menu->ignoreAnchorPointForPosition(false);
 
         // One caption scale for all tabs, sized so the longest name fits next to the icon.
@@ -105,18 +153,22 @@ namespace usl::ui {
             captionScale = std::min(captionScale, captionWidth / probe->getContentWidth());
         }
 
+        float rowWidth = tabW * LIST_COUNT + gap * (LIST_COUNT - 1);
+        float scale = std::min(1.f, width / rowWidth);
         for (auto type : LIST_TYPES) {
             bool active = type == selected;
             auto spr = ButtonSprite::create(
-                listShortName(type), 90, true, "bigFont.fnt",
-                active ? "GJ_button_02.png" : "GJ_button_04.png", 30.f, captionScale
+                listShortName(type), static_cast<int>(tabW), true, "bigFont.fnt",
+                active ? "GJ_button_02.png" : "GJ_button_04.png", tabH, captionScale
             );
             // Make room for the list icon on the left of the caption.
             if (auto lbl = spr->m_label) {
                 lbl->setScale(captionScale);
                 lbl->setPositionX(lbl->getPositionX() + 10.f);
+                // Spam lists share an icon, so their colour tells them apart.
+                if (isSpam(type)) lbl->setColor(active ? ccColor3B { 255, 255, 255 } : listColor(type));
             }
-            auto icon = listIcon(type, 22.f);
+            auto icon = listIcon(type, 21.f);
             icon->setPosition({ 15.f, spr->getContentHeight() / 2.f + 1.f });
             spr->addChild(icon, 5);
             spr->setScale(scale);
@@ -124,21 +176,17 @@ namespace usl::ui {
             auto btn = CCMenuItemExt::createSpriteExtra(spr, [onSelect, type](auto) {
                 if (onSelect) onSelect(type);
             });
-            btn->setID(fmt::format("tab-{}", listKey(type)));
+            btn->setID(fmt::format("tab-{}", listId(type)));
             btn->setEnabled(!active);
             menu->addChild(btn);
         }
 
-        menu->setLayout(RowLayout::create()->setGap(6.f * scale)->setAutoScale(false));
+        menu->setContentSize({ rowWidth * scale, tabH * scale });
+        menu->setLayout(RowLayout::create()->setGap(gap * scale)->setAutoScale(false));
         return menu;
     }
 
     void openSite(std::string const& path) {
         web::openLinkInBrowser(fmt::format("{}{}", SITE, path));
-    }
-
-    std::string trimText(std::string const& text, size_t maxChars) {
-        if (text.size() <= maxChars) return text;
-        return text.substr(0, maxChars - 2) + "..";
     }
 }

@@ -17,6 +17,29 @@ namespace {
         return text;
     }
 
+    std::string listInfo(usl::ListType type) {
+        constexpr const char* sections =
+            "<cy>Main</c> is the top 75, <cj>Extended</c> the rest that give points, <cp>Advanced</c> everything past that.\n";
+        constexpr const char* records =
+            "Beat a level to <cg>100%</c> (or reach its list percent) and send the record on <cl>ultimateshittylist.fun</c>.";
+        switch (type) {
+            case usl::ListType::Classic:
+                return fmt::format("Rated and 1.0-style <cr>Shitty</c> levels, placed by the USL team.\n{}{}", sections, records);
+            case usl::ListType::Challenge:
+                return fmt::format("Short Shitty challenges, placed by the USL team.\n{}{}", sections, records);
+            case usl::ListType::Scl:
+                return fmt::format("Pure CPS spam under Spam Challenge List rules: up to two inputs and four fingers, "
+                    "no drag, scroll or lip spam.\n{}", records);
+            case usl::ListType::Controlled:
+                return fmt::format("Spam that tests control: click patterns, rhythm changes and tight spots where "
+                    "accuracy matters as much as speed.\n{}", records);
+            case usl::ListType::Unlimited:
+                return fmt::format("Any spam a human does: drag, rake, scroll, lip, any number of keys. "
+                    "Macros and autoclickers are banned.\n{}", records);
+        }
+        return records;
+    }
+
     ccColor3B backgroundTint(usl::ListType type) {
         auto c = usl::listDarkColor(type);
         return { static_cast<GLubyte>(std::min(255, c.r + 18)), static_cast<GLubyte>(std::min(255, c.g + 18)), static_cast<GLubyte>(std::min(255, c.b + 18)) };
@@ -89,24 +112,24 @@ bool USLListLayer::init(usl::ListType type) {
     auto refresh = CCMenuItemExt::createSpriteExtra(refreshSpr, [this](auto) {
         showLoading(true);
         WeakRef<USLListLayer> self = this;
-        usl::Store::get().loadLevels(m_type, [self](bool ok) {
-            if (auto layer = self.lock()) {
-                if (ok) layer->applyFilter();
-                else layer->showError("Couldn't load the list.\nCheck your connection.");
-            }
+        auto type = m_type;
+        usl::Store::get().loadLevels(type, [self, type](bool ok) {
+            auto layer = self.lock();
+            if (!layer || layer->m_type != type) return;
+            if (ok) layer->applyFilter();
+            else layer->showError("Couldn't load the list.\nCheck your connection.");
         }, true);
     });
     refresh->setPosition({ winSize.width - 26.f, 26.f });
     refresh->setID("refresh-button");
     menu->addChild(refresh);
 
-    auto infoBtn = InfoAlertButton::create(
-        usl::listName(type),
-        "Levels are ranked by the <cy>USL</c> team.\n"
-        "<cy>Main</c> - top 75, <cj>Extended</c> - the rest that give points, <cp>Advanced</c> - beyond that.\n"
-        "Beat a level to <cg>100%</c> (or reach the list percent) and send your record on <cl>ultimateshittylist.fun</c>.",
-        0.8f
-    );
+    // The text depends on the list, so it is built when tapped, not when the layer opens.
+    auto infoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
+    infoSpr->setScale(0.8f);
+    auto infoBtn = CCMenuItemExt::createSpriteExtra(infoSpr, [this](auto) {
+        FLAlertLayer::create(nullptr, usl::listName(m_type), listInfo(m_type), "OK", nullptr, 360.f)->show();
+    });
     infoBtn->setPosition({ 24.f, winSize.height - 60.f });
     infoBtn->setID("info-button");
     menu->addChild(infoBtn);
@@ -132,13 +155,10 @@ bool USLListLayer::init(usl::ListType type) {
 
     m_pageInfo = usl::ui::label("", "goldFont.fnt", 0.45f);
     m_pageInfo->setAnchorPoint({ 1.f, 1.f });
-    m_pageInfo->setPosition({ winSize.width - 7.f, winSize.height - 4.f });
+    // Under the tab row, right of the list frame: the five tabs need the whole top edge.
+    m_pageInfo->setPosition({ winSize.width - 7.f, winSize.height - 40.f });
     m_pageInfo->setID("page-info"_spr);
     addChild(m_pageInfo, 5);
-
-    m_tabs = usl::ui::listTabs(type, 0.8f, [this](usl::ListType next) { switchList(next); });
-    m_tabs->setPosition({ winSize.width / 2.f, winSize.height - 22.f });
-    addChild(m_tabs, 5);
 
     setKeypadEnabled(true);
     setKeyboardEnabled(true);
@@ -153,7 +173,8 @@ void USLListLayer::switchList(usl::ListType type) {
 
     if (m_tabs) m_tabs->removeFromParent();
     auto winSize = CCDirector::get()->getWinSize();
-    m_tabs = usl::ui::listTabs(type, 0.8f, [this](usl::ListType next) { switchList(next); });
+    // Leave the corners to the back button and the page counter.
+    m_tabs = usl::ui::listTabs(type, std::min(440.f, winSize.width - 120.f), [this](usl::ListType next) { switchList(next); });
     m_tabs->setPosition({ winSize.width / 2.f, winSize.height - 22.f });
     addChild(m_tabs, 5);
 

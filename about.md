@@ -2,31 +2,38 @@
 
 <cy>The Ultimate Shitty List</c>, right inside Geometry Dash.
 
-USL ranks 1.0-style and rated <cr>Shitty</c> levels across three lists. This mod brings the lists, placements, players and recent changes from [ultimateshittylist.fun](https://ultimateshittylist.fun) into the game.
+USL ranks 1.0-style and rated <cr>Shitty</c> levels. This mod brings its lists, placements, rates, players and recent changes from [ultimateshittylist.fun](https://ultimateshittylist.fun) into the game.
 
-## Three lists
+## The lists
 
-- <cl>Classic List</c> - the main ranking of Shitty levels
-- <cy>Challenge List</c> - short challenge levels
-- <cr>Spam List</c> - spam levels
+- <cl>Classic List</c>: the main ranking of Shitty levels
+- <cy>Challenge List</c>: short Shitty challenges
+- <cr>SCL</c>: pure CPS spam under Spam Challenge List rules
+- <co>Controlled</c>: spam that tests click patterns and rhythm
+- <cp>Unlimited</c>: any human spam method, no macros
+
+Every spam list keeps its own placements, points and players.
 
 ## What you get
 
-- **USL hub** - open it with the blue USL button on the level search screen.
-- **Real level cells** - every list page shows normal GD level cells in USL order, ready to play.
-- **Search and filters** - find a level by name, creator, verifier, placement or ID, and filter by <cy>Main</c>, <cj>Extended</c> or <cp>Advanced</c>.
-- **Placements everywhere** - level cells and level pages show the list icon and USL placement.
-- **Level card** - tap the placement on a level page to see points, list percent and every record with its video.
-- **Players** - top 100 of each list, with records, verified levels and hardest level.
-- **Recent changes** - new levels, moves and removals as they happen.
+- **USL hub.** Open it with the round USL button on the level search screen.
+- **Real level cells.** Every list shows normal GD level cells in USL order, ready to play.
+- **Search and filters.** Find a level by name, creator, verifier, placement or ID, and filter by <cy>Main</c>, <cj>Extended</c> or <cp>Advanced</c>.
+- **Placements everywhere.** Level cells and level pages show the list icon and the USL placement.
+- **USL rates.** Levels on the list wear the demon face and the Featured, Epic, Legendary or Mythic glow the USL team gave them.
+- **Level card.** Tap the placement on a level page to see the rate, points, list percent and every record with its video.
+- **Players.** The top 100 of each list, with records, verified levels and their hardest level.
+- **Recent changes.** New levels, moves and removals as they happen.
 
 ## Settings
 
-You can hide placements or points on level pages in the mod settings.
+Placements, points and USL rates can each be turned off in the mod settings. Rates only change how the face looks: your saved levels and the real game rating are never touched.
+
+## Privacy
+
+The mod only downloads public list data from ultimateshittylist.fun. It sends nothing about you or your account. Records are sent on the website.
 
 ## Links
 
 - Website: [ultimateshittylist.fun](https://ultimateshittylist.fun)
 - Discord: [discord.gg/cgARJXV3AH](https://discord.gg/cgARJXV3AH)
-
-Send your records on the website - the mod only reads public list data.

@@ -30,7 +30,7 @@ bool USLPlayersPopup::init(usl::ListType type) {
 
     auto siteBtn = CCMenuItemExt::createSpriteExtra(
         usl::ui::iconSprite("icon_site.png"_spr, 22.f),
-        [this](auto) { usl::ui::openSite(fmt::format("/leaderboard/players?type={}", usl::listKey(m_type))); }
+        [this](auto) { usl::ui::openSite(fmt::format("/leaderboard/players?{}", usl::scopeQuery(m_type))); }
     );
     siteBtn->setPosition({ m_size.width - 22.f, m_size.height - 20.f });
     siteBtn->setID("site-button");
@@ -86,7 +86,7 @@ void USLPlayersPopup::build() {
 
         auto sub = p.hardestName.empty()
             ? fmt::format("{} records", p.records)
-            : fmt::format("{} records  -  hardest #{} {}", p.records, p.hardestRank, p.hardestName);
+            : fmt::format("{} records   |   hardest: #{} {}", p.records, p.hardestRank, p.hardestName);
         auto subLbl = usl::ui::label(sub, "chatFont.fnt", 0.45f, { 200, 210, 230 });
         subLbl->setAnchorPoint({ 0.f, 0.5f });
         subLbl->setPosition({ 62.f, 6.5f });

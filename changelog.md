@@ -1,7 +1,14 @@
 # Changelog
 
-## v1.0.5
+## v1.1.0
 
+- USL rates: levels on the list show the demon difficulty and the Featured, Epic, Legendary or Mythic glow the USL team gave them. Can be turned off in the settings.
+- Spam is now three lists, SCL, Controlled and Unlimited, each with its own placements, players and changes. Before, only SCL levels were shown.
+- The level card shows the USL rate next to the placement.
+- The hub shows the #1 level of every list and the latest change on the Classic List, and fits narrow screens.
+- Every list explains its own rules behind the info button.
+- Icons stay sharp at every size: no more broken outlines on small badges.
+- New USL logo, the same one the website uses.
 - Published by wayago under the id wayago.usl-integration. Settings start fresh.
 
 ## v1.0.4

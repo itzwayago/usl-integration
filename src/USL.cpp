@@ -35,6 +35,32 @@ namespace usl {
             return static_cast<int>(num(obj, key, fallback));
         }
 
+        std::optional<ListType> listFromKeys(std::string_view list, std::string_view spam) {
+            if (list == "classic") return ListType::Classic;
+            if (list == "challenge") return ListType::Challenge;
+            if (list != "spam") return std::nullopt;
+            if (spam == "controlled") return ListType::Controlled;
+            if (spam == "unlimited") return ListType::Unlimited;
+            return ListType::Scl;
+        }
+
+        Difficulty difficultyFromKey(std::string_view key) {
+            if (key == "easy_demon") return Difficulty::Easy;
+            if (key == "medium_demon") return Difficulty::Medium;
+            if (key == "hard_demon") return Difficulty::Hard;
+            if (key == "insane_demon") return Difficulty::Insane;
+            if (key == "extreme_demon") return Difficulty::Extreme;
+            return Difficulty::None;
+        }
+
+        Quality qualityFromKey(std::string_view key) {
+            if (key == "featured") return Quality::Featured;
+            if (key == "epic") return Quality::Epic;
+            if (key == "legendary") return Quality::Legendary;
+            if (key == "mythic") return Quality::Mythic;
+            return Quality::None;
+        }
+
         Level parseLevel(matjson::Value const& v, ListType fallbackList) {
             Level level;
             level.slug = str(v, "slug");
@@ -43,7 +69,7 @@ namespace usl {
             level.verifier = str(v, "verifier");
             level.category = str(v, "category");
             level.youtubeUrl = str(v, "youtubeUrl");
-            level.list = listFromKey(str(v, "listType")).value_or(fallbackList);
+            level.list = listFromKeys(str(v, "listType"), str(v, "spamList")).value_or(fallbackList);
             level.rank = integer(v, "rank");
             level.listPercent = integer(v, "listPercent", 100);
             level.points = num(v, "points");
@@ -56,18 +82,43 @@ namespace usl {
         }
     }
 
+    bool isSpam(ListType type) {
+        return type == ListType::Scl || type == ListType::Controlled || type == ListType::Unlimited;
+    }
+
     const char* listKey(ListType type) {
         switch (type) {
+            case ListType::Classic: return "classic";
             case ListType::Challenge: return "challenge";
-            case ListType::Spam: return "spam";
+            default: return "spam";
+        }
+    }
+
+    const char* listId(ListType type) {
+        switch (type) {
+            case ListType::Challenge: return "challenge";
+            case ListType::Scl: return "scl";
+            case ListType::Controlled: return "controlled";
+            case ListType::Unlimited: return "unlimited";
             default: return "classic";
+        }
+    }
+
+    std::string scopeQuery(ListType type) {
+        switch (type) {
+            case ListType::Scl: return "list=spam&spam=scl";
+            case ListType::Controlled: return "list=spam&spam=controlled";
+            case ListType::Unlimited: return "list=spam&spam=unlimited";
+            default: return fmt::format("list={}", listKey(type));
         }
     }
 
     const char* listName(ListType type) {
         switch (type) {
             case ListType::Challenge: return "Challenge List";
-            case ListType::Spam: return "Spam List";
+            case ListType::Scl: return "SCL Spam List";
+            case ListType::Controlled: return "Controlled Spam List";
+            case ListType::Unlimited: return "Unlimited Spam List";
             default: return "Classic List";
         }
     }
@@ -75,23 +126,35 @@ namespace usl {
     const char* listShortName(ListType type) {
         switch (type) {
             case ListType::Challenge: return "Challenge";
-            case ListType::Spam: return "Spam";
+            case ListType::Scl: return "SCL";
+            case ListType::Controlled: return "Controlled";
+            case ListType::Unlimited: return "Unlimited";
             default: return "Classic";
+        }
+    }
+
+    const char* listAbbr(ListType type) {
+        switch (type) {
+            case ListType::Controlled: return "CTRL";
+            case ListType::Unlimited: return "UNL";
+            default: return listShortName(type);
         }
     }
 
     const char* listIcon(ListType type) {
         switch (type) {
+            case ListType::Classic: return "list_classic.png"_spr;
             case ListType::Challenge: return "list_challenge.png"_spr;
-            case ListType::Spam: return "list_spam.png"_spr;
-            default: return "list_classic.png"_spr;
+            default: return "list_spam.png"_spr;
         }
     }
 
     ccColor3B listColor(ListType type) {
         switch (type) {
             case ListType::Challenge: return { 255, 194, 61 };
-            case ListType::Spam: return { 255, 107, 107 };
+            case ListType::Scl: return { 255, 107, 107 };
+            case ListType::Controlled: return { 255, 150, 80 };
+            case ListType::Unlimited: return { 214, 120, 255 };
             default: return { 71, 176, 255 };
         }
     }
@@ -99,16 +162,32 @@ namespace usl {
     ccColor3B listDarkColor(ListType type) {
         switch (type) {
             case ListType::Challenge: return { 120, 74, 18 };
-            case ListType::Spam: return { 112, 30, 42 };
+            case ListType::Scl: return { 112, 30, 42 };
+            case ListType::Controlled: return { 112, 52, 22 };
+            case ListType::Unlimited: return { 74, 34, 112 };
             default: return { 22, 58, 112 };
         }
     }
 
-    std::optional<ListType> listFromKey(std::string_view key) {
-        if (key == "classic") return ListType::Classic;
-        if (key == "challenge") return ListType::Challenge;
-        if (key == "spam") return ListType::Spam;
-        return std::nullopt;
+    const char* difficultyName(Difficulty difficulty) {
+        switch (difficulty) {
+            case Difficulty::Easy: return "Easy Demon";
+            case Difficulty::Medium: return "Medium Demon";
+            case Difficulty::Hard: return "Hard Demon";
+            case Difficulty::Insane: return "Insane Demon";
+            case Difficulty::Extreme: return "Extreme Demon";
+            default: return "";
+        }
+    }
+
+    const char* qualityName(Quality quality) {
+        switch (quality) {
+            case Quality::Featured: return "Featured";
+            case Quality::Epic: return "Epic";
+            case Quality::Legendary: return "Legendary";
+            case Quality::Mythic: return "Mythic";
+            default: return "";
+        }
     }
 
     std::string categoryName(std::string_view category) {
@@ -176,6 +255,19 @@ namespace usl {
         async::spawn(runFetch(url(path), std::move(done)));
     }
 
+    // Answers straight away from a fresh cache, otherwise queues `done`.
+    // Returns true when the caller has to start the request.
+    bool Store::claim(Slot& slot, Done& done, int64_t ttl, bool force) {
+        if (!force && slot.loaded && nowMs() - slot.loadedAt < ttl) {
+            if (done) done(true);
+            return false;
+        }
+        slot.waiting.push_back(std::move(done));
+        if (slot.loading) return false;
+        slot.loading = true;
+        return true;
+    }
+
     void Store::finish(Slot& slot, bool ok) {
         slot.loading = false;
         if (ok) {
@@ -189,26 +281,30 @@ namespace usl {
         }
     }
 
+    void Store::applyRates(std::vector<Level>& levels) const {
+        for (auto& level : levels) {
+            auto it = m_rates.find(level.slug);
+            if (it == m_rates.end()) continue;
+            level.difficulty = it->second.difficulty;
+            level.quality = it->second.quality;
+        }
+    }
+
     void Store::loadLevels(ListType type, Done done, bool force) {
         auto idx = static_cast<size_t>(type);
-        auto& slot = m_levelSlots[idx];
-        if (!force && slot.loaded && nowMs() - slot.loadedAt < LEVELS_TTL_MS) {
-            if (done) done(true);
-            return;
-        }
-        slot.waiting.push_back(std::move(done));
-        if (slot.loading) return;
-        slot.loading = true;
+        if (!claim(m_levelSlots[idx], done, LEVELS_TTL_MS, force)) return;
 
-        fetch(fmt::format("/levels?list={}", listKey(type)), [this, type, idx](std::optional<matjson::Value> data) {
+        fetch(fmt::format("/levels?{}", scopeQuery(type)), [this, type, idx](std::optional<matjson::Value> data) {
             bool ok = data && data->isArray();
             if (ok) {
                 std::vector<Level> parsed;
                 for (auto const& item : *data) {
                     auto level = parseLevel(item, type);
+                    // Upcoming levels have no placement yet.
                     if (level.rank > 0) parsed.push_back(std::move(level));
                 }
                 std::ranges::sort(parsed, {}, &Level::rank);
+                applyRates(parsed);
                 m_levels[idx] = std::move(parsed);
                 rebuildIndex();
             }
@@ -216,29 +312,41 @@ namespace usl {
         });
     }
 
+    void Store::loadRates(Done done) {
+        if (!claim(m_rateSlot, done, LEVELS_TTL_MS)) return;
+
+        fetch("/community/levels", [this](std::optional<matjson::Value> data) {
+            bool ok = data && data->isObject() && data->contains("levels") && (*data)["levels"].isArray();
+            if (ok) {
+                m_rates.clear();
+                for (auto const& item : (*data)["levels"]) {
+                    Rate rate { difficultyFromKey(str(item, "difficulty")), qualityFromKey(str(item, "quality")) };
+                    if (rate.difficulty != Difficulty::None || rate.quality != Quality::None) {
+                        m_rates.emplace(str(item, "slug"), rate);
+                    }
+                }
+                for (auto& levels : m_levels) applyRates(levels);
+            }
+            finish(m_rateSlot, ok);
+        });
+    }
+
     void Store::loadAllLevels(Done done) {
-        auto remaining = std::make_shared<int>(3);
+        auto remaining = std::make_shared<size_t>(LIST_COUNT + 1);
         auto allOk = std::make_shared<bool>(true);
-        for (auto type : LIST_TYPES) {
-            loadLevels(type, [remaining, allOk, done](bool ok) {
-                *allOk = *allOk && ok;
-                if (--*remaining == 0 && done) done(*allOk);
-            });
-        }
+        auto step = [remaining, allOk, done](bool ok) {
+            *allOk = *allOk && ok;
+            if (--*remaining == 0 && done) done(*allOk);
+        };
+        loadRates(step);
+        for (auto type : LIST_TYPES) loadLevels(type, step);
     }
 
     void Store::loadPlayers(ListType type, Done done) {
         auto idx = static_cast<size_t>(type);
-        auto& slot = m_playerSlots[idx];
-        if (slot.loaded && nowMs() - slot.loadedAt < SHORT_TTL_MS) {
-            if (done) done(true);
-            return;
-        }
-        slot.waiting.push_back(std::move(done));
-        if (slot.loading) return;
-        slot.loading = true;
+        if (!claim(m_playerSlots[idx], done, SHORT_TTL_MS)) return;
 
-        fetch(fmt::format("/leaderboards/players?list={}", listKey(type)), [this, idx](std::optional<matjson::Value> data) {
+        fetch(fmt::format("/leaderboards/players?{}", scopeQuery(type)), [this, idx](std::optional<matjson::Value> data) {
             bool ok = data && data->isArray();
             if (ok) {
                 std::vector<Player> parsed;
@@ -265,16 +373,9 @@ namespace usl {
 
     void Store::loadChanges(ListType type, Done done) {
         auto idx = static_cast<size_t>(type);
-        auto& slot = m_changeSlots[idx];
-        if (slot.loaded && nowMs() - slot.loadedAt < SHORT_TTL_MS) {
-            if (done) done(true);
-            return;
-        }
-        slot.waiting.push_back(std::move(done));
-        if (slot.loading) return;
-        slot.loading = true;
+        if (!claim(m_changeSlots[idx], done, SHORT_TTL_MS)) return;
 
-        fetch(fmt::format("/changes?list={}", listKey(type)), [this, idx](std::optional<matjson::Value> data) {
+        fetch(fmt::format("/changes?{}", scopeQuery(type)), [this, idx](std::optional<matjson::Value> data) {
             bool ok = data && data->isArray();
             if (ok) {
                 std::vector<Change> parsed;
@@ -288,6 +389,8 @@ namespace usl {
                     c.capturedAt = static_cast<int64_t>(num(item, "capturedAt"));
                     parsed.push_back(std::move(c));
                 }
+                // Newest first, whatever order the API answers in.
+                std::ranges::stable_sort(parsed, std::greater<>{}, &Change::capturedAt);
                 m_changes[idx] = std::move(parsed);
             }
             finish(m_changeSlots[idx], ok);
@@ -295,14 +398,7 @@ namespace usl {
     }
 
     void Store::loadStats(Done done) {
-        auto& slot = m_statsSlot;
-        if (slot.loaded && nowMs() - slot.loadedAt < SHORT_TTL_MS) {
-            if (done) done(true);
-            return;
-        }
-        slot.waiting.push_back(std::move(done));
-        if (slot.loading) return;
-        slot.loading = true;
+        if (!claim(m_statsSlot, done, SHORT_TTL_MS)) return;
 
         fetch("/stats", [this](std::optional<matjson::Value> data) {
             bool ok = data && data->isObject();
@@ -313,12 +409,12 @@ namespace usl {
                 s.levels = integer(*data, "approvedLevels");
                 if (data->contains("byList") && (*data)["byList"].isObject()) {
                     auto const& byList = (*data)["byList"];
-                    for (auto type : LIST_TYPES) {
-                        auto key = listKey(type);
-                        if (!byList.contains(key)) continue;
-                        s.levelsByList[static_cast<size_t>(type)] = integer(byList[key], "approvedLevels");
-                        s.recordsByList[static_cast<size_t>(type)] = integer(byList[key], "approvedRecords");
-                    }
+                    auto records = [&](const char* key) {
+                        return byList.contains(key) ? integer(byList[key], "approvedRecords") : 0;
+                    };
+                    s.classicRecords = records("classic");
+                    s.challengeRecords = records("challenge");
+                    s.spamRecords = records("spam");
                 }
                 m_stats = s;
             }
@@ -327,13 +423,17 @@ namespace usl {
     }
 
     void Store::loadLevel(std::string const& slug, std::function<void(std::optional<LevelDetails>)> done) {
-        fetch(fmt::format("/levels/{}", slug), [done = std::move(done)](std::optional<matjson::Value> data) {
+        fetch(fmt::format("/levels/{}", slug), [this, done = std::move(done)](std::optional<matjson::Value> data) {
             if (!data || !data->isObject() || !data->contains("level")) {
                 done(std::nullopt);
                 return;
             }
             LevelDetails details;
             details.level = parseLevel((*data)["level"], ListType::Classic);
+            if (auto it = m_rates.find(details.level.slug); it != m_rates.end()) {
+                details.level.difficulty = it->second.difficulty;
+                details.level.quality = it->second.quality;
+            }
             if (data->contains("records") && (*data)["records"].isArray()) {
                 for (auto const& item : (*data)["records"]) {
                     Record r;
@@ -362,6 +462,7 @@ namespace usl {
 
     void Store::rebuildIndex() {
         m_byGdId.clear();
+        // LIST_TYPES order decides which placement a level shows when it sits on two lists.
         for (auto const& list : m_levels) {
             for (auto const& level : list) {
                 if (level.gdId > 0) m_byGdId.emplace(level.gdId, &level);

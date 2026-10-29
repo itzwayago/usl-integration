@@ -8,6 +8,16 @@ namespace {
     constexpr float W = 390.f;
     constexpr float H = 270.f;
 
+    // Colours of the rate glows in the game.
+    ccColor3B qualityColor(usl::Quality quality) {
+        switch (quality) {
+            case usl::Quality::Epic: return { 255, 160, 60 };
+            case usl::Quality::Legendary: return { 235, 110, 255 };
+            case usl::Quality::Mythic: return { 110, 230, 255 };
+            default: return { 255, 220, 70 };
+        }
+    }
+
     CCNode* chip(CCNode* icon, std::string const& text, ccColor3B textColor, ccColor3B bgColor) {
         auto node = CCNode::create();
         auto lbl = usl::ui::label(text, "bigFont.fnt", 0.38f, textColor);
@@ -47,7 +57,7 @@ bool USLLevelPopup::init(usl::Level const& level) {
 
     auto credits = level.verifier.empty()
         ? fmt::format("by {}", level.creator)
-        : fmt::format("by {}  -  verified by {}", level.creator, level.verifier);
+        : fmt::format("by {}   |   verified by {}", level.creator, level.verifier);
     auto creditsLbl = usl::ui::label(credits, "goldFont.fnt", 0.5f);
     creditsLbl->limitLabelWidth(W - 40.f, 0.5f, 0.2f);
     creditsLbl->setPosition({ W / 2.f, H - 42.f });
@@ -57,6 +67,12 @@ bool USLLevelPopup::init(usl::Level const& level) {
     auto chips = CCNode::create();
     chips->setID("chips"_spr);
     chips->addChild(usl::ui::rankBadge(level.list, level.rank, 20.f, fmt::format("{} Top ", usl::listShortName(level.list))));
+    if (auto face = usl::ui::rateFace(level, 15.f)) {
+        chips->addChild(chip(face, usl::difficultyName(level.difficulty), { 255, 255, 255 }, { 30, 30, 45 }));
+    }
+    if (level.quality != usl::Quality::None) {
+        chips->addChild(chip(nullptr, usl::qualityName(level.quality), qualityColor(level.quality), { 30, 30, 45 }));
+    }
     chips->addChild(chip(nullptr, usl::categoryName(level.category), usl::categoryColor(level.category), { 30, 30, 45 }));
     chips->addChild(chip(nullptr, fmt::format("{} pts", usl::formatPoints(level.points)), { 120, 255, 140 }, { 30, 30, 45 }));
     chips->addChild(chip(nullptr, fmt::format("List {}%", level.listPercent), { 140, 210, 255 }, { 30, 30, 45 }));
@@ -116,7 +132,7 @@ bool USLLevelPopup::init(usl::Level const& level) {
         if (!popup) return;
         popup->m_spinner->setVisible(false);
         if (!details) {
-            popup->m_recordsTitle->setString("Records - couldn't load");
+            popup->m_recordsTitle->setString("Records couldn't load");
             return;
         }
         popup->buildRecords(details->records);
@@ -130,7 +146,7 @@ void USLLevelPopup::buildRecords(std::vector<usl::Record> const& records) {
     float w = m_scroll->getContentWidth();
 
     if (records.empty()) {
-        auto none = usl::ui::label("No records yet - be the first!", "bigFont.fnt", 0.4f);
+        auto none = usl::ui::label("No records yet. Be the first!", "bigFont.fnt", 0.4f);
         none->setPosition({ w / 2.f, m_scroll->getContentHeight() / 2.f });
         m_scroll->addChild(none, 5);
         return;

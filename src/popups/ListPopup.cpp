@@ -39,7 +39,7 @@ float USLListPopup::rowWidth() const {
 void USLListPopup::selectList(usl::ListType type) {
     m_type = type;
     if (m_tabs) m_tabs->removeFromParent();
-    m_tabs = usl::ui::listTabs(type, 0.72f, [this](usl::ListType next) { selectList(next); });
+    m_tabs = usl::ui::listTabs(type, m_size.width - 30.f, [this](usl::ListType next) { selectList(next); });
     m_tabs->setPosition({ m_size.width / 2.f, m_size.height - 46.f });
     m_mainLayer->addChild(m_tabs, 5);
 

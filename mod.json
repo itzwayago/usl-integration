@@ -6,9 +6,9 @@
 	},
 	"id": "wayago.usl-integration",
 	"name": "USL Integration",
-	"version": "v1.0.5",
+	"version": "v1.1.0",
 	"developer": "wayago",
-	"description": "The Ultimate Shitty List in-game: Classic, Challenge and Spam lists, placements, players and changes.",
+	"description": "The Ultimate Shitty List in game: Classic, Challenge and three Spam lists, placements, USL rates, players and changes.",
 	"settings": {
 		"placements-title": {
 			"type": "title",
@@ -25,6 +25,16 @@
 			"name": "Show points on level pages",
 			"default": true,
 			"description": "Shows how many USL points a level gives next to its placement."
+		},
+		"rates-title": {
+			"type": "title",
+			"name": "Rates"
+		},
+		"fake-rate": {
+			"type": "bool",
+			"name": "Show USL rates",
+			"default": true,
+			"description": "Levels on the list show the demon difficulty and rate (Featured, Epic, Legendary, Mythic) set by the USL team instead of their in-game rating. Only the look changes, your saved levels stay as they are."
 		}
 	},
 	"resources": {
@@ -37,7 +47,8 @@
 	},
 	"links": {
 		"homepage": "https://ultimateshittylist.fun",
-		"community": "https://discord.gg/cgARJXV3AH"
+		"community": "https://discord.gg/cgARJXV3AH",
+		"source": "https://github.com/itzwayago/usl-integration"
 	},
 	"tags": [
 		"online",

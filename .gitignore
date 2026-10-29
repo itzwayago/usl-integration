@@ -1,5 +1,5 @@
 # CMake build trees (Windows, Android 32/64) and packaged .geode files
 /build*/
 /dist/
-# local verification build log
-/build-check.log
+# local verification build logs
+/build-check*.log
